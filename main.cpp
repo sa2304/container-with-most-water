@@ -6,28 +6,30 @@
 using namespace std;
 
 class Solution {
+  auto getIntersections(const vector<int>& height) {
+    unordered_map<int, vector<int>> intersections;
+    for (int i = 0; i < height.size(); ++i) {
+      int h = height[i];
+      while (0 < h) {
+        intersections[h--].push_back(i);
+      }
+    }
+
+    return intersections;
+  }
+
  public:
   int maxArea(vector<int>& height) {
     int max_area = 0;
     if (not height.empty()) {
+      auto intersections = getIntersections(height);
       int waterline = *max_element(height.begin(), height.end());
       while (0 < waterline) {
-        int left = -1;
-        for (int i = 0; i < height.size(); ++i) {
-          if (waterline <= height[i]) {
-            left = i;
-            break;
-          }
-        }
-        if (0 <= left) {
-          int right = -1;
-          for (int k = height.size() - 1; left < k; --k) {
-            if (waterline <= height[k]) {
-              right = k;
-              break;
-            }
-          }
-          if (0 < right) {
+        if (intersections.count(waterline)) {
+          const auto& lines = intersections[waterline];
+          if (1 < lines.size()) {
+            int left = lines.front();
+            int right = lines.back();
             max_area = max(max_area, (right - left) * waterline);
           }
         }
