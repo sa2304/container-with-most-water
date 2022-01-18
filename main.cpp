@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -6,35 +5,14 @@
 using namespace std;
 
 class Solution {
-  auto getIntersections(const vector<int>& height) {
-    unordered_map<int, vector<int>> intersections;
-    for (int i = 0; i < height.size(); ++i) {
-      int h = height[i];
-      while (0 < h) {
-        intersections[h--].push_back(i);
-      }
-    }
-
-    return intersections;
-  }
-
  public:
-  int maxArea(vector<int>& height) {
+  int maxArea(vector<int> &height) {
     int max_area = 0;
-    if (not height.empty()) {
-      auto intersections = getIntersections(height);
-      int waterline = *max_element(height.begin(), height.end());
-      while (0 < waterline) {
-        if (intersections.count(waterline)) {
-          const auto& lines = intersections[waterline];
-          if (1 < lines.size()) {
-            int left = lines.front();
-            int right = lines.back();
-            max_area = max(max_area, (right - left) * waterline);
-          }
-        }
-        --waterline;
-      }
+    int left = 0, right = height.size() - 1;
+    while (left < right) {
+      max_area = max(max_area, (right - left) * min(height[left], height[right]));
+      if (height[left] < height[right]) { ++left; }
+      else { --right; }
     }
 
     return max_area;
@@ -44,12 +22,28 @@ class Solution {
 void TestMaxArea() {
   Solution s;
   {
-    vector<int> heights{1,8,6,2,5,4,8,3,7};
+    vector<int> heights{1, 8, 6, 2, 5, 4, 8, 3, 7};
     assert(49 == s.maxArea(heights));
   }
   {
-    vector<int> heights{1,1};
+    vector<int> heights{1, 1};
     assert(1 == s.maxArea(heights));
+  }
+  {
+    vector<int> heights{1, 2};
+    assert(1 == s.maxArea(heights));
+  }
+  {
+    vector<int> heights{1, 0, 0, 0, 0, 0, 0, 2, 2};
+    assert(8 == s.maxArea(heights));
+  }
+  {
+    vector<int> heights{2, 3, 10, 5, 7, 8, 9};
+    assert(36 == s.maxArea(heights));
+  }
+  {
+    vector<int> heights{1, 2, 4, 3};
+    assert(4 == s.maxArea(heights));
   }
 }
 
